@@ -18,7 +18,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 
-mongoose.connect("mongodb+srv://janiahharris205:nguzqAs9JQhL79R0@know-your-money.n2vum.mongodb.net/?retryWrites=true&w=majority&appName=know-your-money", { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect("MONGODB_CONNECTION_STRING", { useNewUrlParser: true, useUnifiedTopology: true })
 
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.log(err));
