@@ -8,20 +8,32 @@ const cors = require('cors');
 const plaid = require('plaid');
 const {PLAID_CLIENT_ID, PLAID_SECRET} = require('./key');
 
-const client = new plaid.Client({
-        clientID: PLAID_CLIENT_ID,
-        secret: PLAID_SECRET,
-        env: plaid.environments.sandbox
+// Modified: https://www.npmjs.com/package/plaid
+// The constructor has been changed for the client
+const client = new plaid.Configuration({
+        basePath: plaid.PlaidEnvironments.sandbox,
+        baseOptions: {
+            headers: {
+                'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
+                'PLAID-SECRET': PLAID_SECRET
+            }
+        }
 });
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 
-mongoose.connect("MONGODB_CONNECTION_STRING", { useNewUrlParser: true, useUnifiedTopology: true })
-
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.log(err));
+// Assumes MongoDB instance is available, I created one using a Docker container: 
+// Reference: https://hub.docker.com/_/mongo
+// docker run --name kym-mongo -d \
+// -p 21000:27017 \
+// -e MONGO_INITDB_ROOT_USERNAME=kym -e MONGO_INITDB_ROOT_PASSWORD=kym -e MONGO_INITDB_DATABASE=kym \
+// -v ./mongo_data:/data/db mongo:4
+// Note: I used a "non-standard" port (21000) for the instance I created.
+mongoose.connect("mongodb://kym:kym@localhost:21000/users?authSource=admin")
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err));
 
 const db = mongoose.connection;
 let userSchema = mongoose.Schema({
@@ -47,16 +59,18 @@ app.post('/signup', (req, res) => {
         newUser.save((err, user) => { res.send({message:`User created with ID: ${user._id}`})});
     });
 
-app.post('/login', (req, res) => {
+// Modified due to mongoose 8.7.3 updates: https://mongoosejs.com/docs/api/query.html#Query.prototype.findOne()
+// I mainly just removed the callback, as MongooseJS seems to no longer support them in their queries.
+app.post('/login', async (req, res) => {
         let {email, password } = req.body;
-        User.findOne({email, password}, (err, doc) => {
-            if (err){
-                res.sendStatus(400);
-                return;
-            }
-            res.send({id:doc._id})
+        const user = await User.findOne({email, password});
 
-            });
+        if (!user){
+            res.sendStatus(401);
+            console.error(`User with email "${email}" and password "${password}" not found`)
+            return;
+        }
+        res.send({id:doc._id})
     });
 
 app.post('/create_link_token', (req, res) => {
