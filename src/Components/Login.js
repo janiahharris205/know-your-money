@@ -10,8 +10,9 @@ class Login extends Component{
     constructor(props){
         super(props);
 
-        this.state = {email: '',
-                      password: ''
+        this.state = {
+            email: '',
+            password: ''
         };
 
         this.updateEmail = this.updateEmail.bind(this);
@@ -20,33 +21,38 @@ class Login extends Component{
 
     }
 
+    //update state as email input changes
     updateEmail(event){
         this.setState({
             email: event.target.value
         }, () => console.log(this.state));
     }
 
+    //update state as password input changes
     updatePassword(event){
         this.setState({
             password: event.target.value
         }, () => console.log(this.state));
     }
 
+    //handle form submission and dispatch login action
     submitForm(event){
         event.preventDefault();
 
         this.props.loginUser(this.state.email, this.state.password);
     }
 
+    //react lifecycle method, triggers after component re-renders
     componentDidUpdate(){
+        //check if user is logged in and dispatch additional actions
         if (this.props.uid !== ''){
-
             this.props.generateLinkToken(this.props.uid);
             this.props.getTransactions(this.props.uid);
         }
     }
 
     render(){
+        //if user is logged in, redirect to overview page
         if (this.props.isLoggedin){
             return (<Navigate to={{pathname: "/overview", state: {uid: this.state.uid}}}/>)
         }
@@ -90,10 +96,13 @@ class Login extends Component{
     }
 }
 
+//mapping Redux state to component props
 const mapStateToProps = state => ({
-    uid: state.login.uid,
-    isLoggedin: state.login.isLoggedin,
-    link_token: state.login.link_token,
-    transactions: state.login.transactions
+    uid: state.login.uid, //user ID from Redux login state
+    isLoggedin: state.login.isLoggedin, //login status
+    link_token: state.login.link_token, //link token from login state
+    transactions: state.login.transactions //transactions data
 });
+
+//connect component to Redux store and map actions as props
 export default connect(mapStateToProps, { loginUser, generateLinkToken, getTransactions})(Login);

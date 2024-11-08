@@ -1,6 +1,7 @@
 import { GENERATE_LINK_TOKEN , GENERATE_LINK_TRANSACTIONS} from './types';
 import axios from 'axios';
 
+//generate link transactions by exchanging a public token for access and retrieving transactions
 export const generateLinkTransactions = (public_token, uid, callback) => dispatch => {
     axios.post('http://localhost:3001/get_access_token',{public_token, uid})
          .then(res => {

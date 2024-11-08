@@ -1,3 +1,5 @@
+//action types used in Redux to identify the type of state change
+
 export const LOGIN_USER = 'LOGIN_USER';
 export const SIGNUP_USER = 'SIGNUP_USER';
 export const GENERATE_LINK_TOKEN = 'GENERATE_LINK_TOKEN';

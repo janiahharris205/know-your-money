@@ -10,39 +10,43 @@ class SignUp extends Component{
     constructor(props){
         super(props);
 
-        this.state = {email: '',
-                      password: ''
+        this.state = {
+            email: '',
+            password: ''
         };
 
+        //binding methods to class instance
         this.updateEmail = this.updateEmail.bind(this);
         this.updatePassword = this.updatePassword.bind(this);
         this.submitForm = this.submitForm.bind(this);
-
     }
 
+    //update email state as input changes
     updateEmail(event){
         this.setState({
             email: event.target.value
         });
     }
 
+    //update password state as input changes
     updatePassword(event){
         this.setState({
             password: event.target.value
         });
     }
 
+    //handle form submission and dispatch signup action
     submitForm(){
         this.props.signupUser(this.state.email, this.state.password);
     }
 
     render(){
-            if (this.props.formCompleted){
-                return (<Navigate to="/sign-in" />)
-            }
-            return (
-                <>
-                <Container maxWidth='sm'>
+        //redirect to sign-in page if signup is completed
+        if (this.props.formCompleted){
+            return (<Navigate to="/sign-in" />)
+        }
+        return (
+            <Container maxWidth='sm'>
                 <Grid
                     container
                     direction="column"
@@ -63,13 +67,13 @@ class SignUp extends Component{
                             <Button variant="contained" color="primary" onClick={this.submitForm}>Create Account</Button>
                 </Grid>
             </Container>
-            </>
         )
     }
 }
 
+//mapping Redux state to component props
 const mapStateToProps = state => ({
-        formCompleted: state.signup.formCompleted
+        formCompleted: state.signup.formCompleted //indicates signup completion status
 });
-
+//connect component to Redux store and map actions as props
 export default connect(mapStateToProps, { signupUser })(SignUp);

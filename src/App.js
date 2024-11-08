@@ -16,6 +16,7 @@ class App extends Component {
     this.isLoggedIn = this.isLoggedIn.bind(this);
   }
 
+  //checks if the user is logged in
   isLoggedIn(){
     if (this.props.isLoggedIn){
       return true
@@ -41,8 +42,10 @@ render () {
 }
 }
 
+//maps login state from Redux to component props
 const mapStateToProps = state => ({
   isLoggedIn: state.login.isLoggedin
 })
 
+//connect component to Redux
 export default connect(mapStateToProps, {})(App);
